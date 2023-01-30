@@ -4,49 +4,63 @@ package pl.lukasik.urlShortener.url.service;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import pl.lukasik.urlShortener.url.common.UrlUtil;
 import pl.lukasik.urlShortener.url.model.Url;
 import pl.lukasik.urlShortener.url.model.dto.ShortUrlDto;
 import pl.lukasik.urlShortener.url.repository.UrlRepository;
 
-import java.util.Date;
-import java.util.Optional;
+import java.io.IOException;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 
 @Service
-
 public class UrlService {
 
     private final UrlRepository urlRepository;
+    private final UrlUtil urlUtil;
+
     @Value("${shortenerHost}")
     private String shortenerHost;
 
-    public UrlService(UrlRepository urlRepository) {
+    public UrlService(UrlRepository urlRepository, UrlUtil urlUtil) {
         this.urlRepository = urlRepository;
+        this.urlUtil = urlUtil;
     }
-
 
     public ShortUrlDto shortenUrl(String longUrl) {
-        Url url = saveUrl(longUrl);
+        String validUrl = null;
+
+        try {
+            validUrl = urlUtil.checkUrl(longUrl);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Url url = saveUrl(validUrl);
+
         return ShortUrlDto.builder()
-                  .short_url(url.getShort_url())
-                  .created_at(url.getCreated_at())
-                  .build();
+                .short_url(url.getShort_url())
+                .created_at(url.getCreated_at())
+                .original_url(validUrl)
+                .build();
     }
 
+
     public String getOriginalUrl(String shortUrl) {
-        String[] parts = shortUrl.split("/");
-        String objectId = parts[parts.length - 1];
-        Url retrieveUrl = urlRepository.findById(objectId).orElseThrow();
+        Url retrieveUrl = urlRepository.findById(shortUrl).orElseThrow();
         return retrieveUrl.getOriginal_url();
     }
 
     private Url saveUrl(String longUrl) {
         ObjectId newObjectId = new ObjectId();
-        Url url = new Url();
-        url.set_id(newObjectId);
-        url.setOriginal_url(longUrl);
-        url.setShort_url(shortenerHost+newObjectId);
-        url.setCreated_at(new Date());
+        Url url = Url.builder()
+                .id(newObjectId)
+                .original_url(longUrl)
+                .short_url(shortenerHost + newObjectId)
+                .created_at(Instant.now())
+                .build();
         urlRepository.save(url);
         return url;
     }

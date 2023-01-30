@@ -5,6 +5,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.Instant;
 import java.util.Date;
 
 @Builder
@@ -16,8 +17,8 @@ import java.util.Date;
 public class Url {
 
     @Id
-    private ObjectId _id;
+    private ObjectId id;
     private String original_url;
     private String short_url;
-    private Date created_at;
+    private Instant created_at;
 }

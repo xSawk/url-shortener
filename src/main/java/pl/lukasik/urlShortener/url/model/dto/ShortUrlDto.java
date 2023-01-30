@@ -4,11 +4,17 @@ package pl.lukasik.urlShortener.url.model.dto;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 @Builder
 @Getter
 public class ShortUrlDto {
     private String short_url;
-    private Date created_at;
+    private String original_url;
+    private Instant created_at;
+
+
+
 }
