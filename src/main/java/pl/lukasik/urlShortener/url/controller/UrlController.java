@@ -8,6 +8,8 @@ import pl.lukasik.urlShortener.url.model.dto.LongUrlDto;
 import pl.lukasik.urlShortener.url.model.dto.ShortUrlDto;
 import pl.lukasik.urlShortener.url.service.UrlService;
 
+import java.io.IOException;
+
 
 @RestController
 public class UrlController {
@@ -19,8 +21,8 @@ public class UrlController {
     }
 
     @PostMapping("/api/shortener")
-    public ShortUrlDto shortenUrl(@RequestBody LongUrlDto longUrl){
-        return urlService.shortenUrl(longUrl.getLongUrl());
+    public ShortUrlDto shortenUrl(@RequestBody LongUrlDto longUrl) {
+            return urlService.shortenUrl(longUrl.getLongUrl());
     }
 
     @GetMapping("/{shortUrl}")

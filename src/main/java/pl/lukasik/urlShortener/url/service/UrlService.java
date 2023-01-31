@@ -30,16 +30,8 @@ public class UrlService {
     }
 
     public ShortUrlDto shortenUrl(String longUrl) {
-        String validUrl = null;
-
-        try {
-            validUrl = urlUtil.checkUrl(longUrl);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+        String validUrl = urlUtil.checkUrl(longUrl);
         Url url = saveUrl(validUrl);
-
         return ShortUrlDto.builder()
                 .short_url(url.getShort_url())
                 .created_at(url.getCreated_at())

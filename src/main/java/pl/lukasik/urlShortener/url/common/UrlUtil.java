@@ -2,27 +2,34 @@ package pl.lukasik.urlShortener.url.common;
 
 
 import org.apache.commons.validator.routines.UrlValidator;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import pl.lukasik.urlShortener.url.exception.InvalidUrlException;
+import pl.lukasik.urlShortener.url.exception.UrlException;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.SQLOutput;
+
 
 @Component
 public class UrlUtil {
 
-    public String checkUrl(String longUrl) throws IOException {
+    @Value("${shortenerHost}")
+    private String shortenerHost;
+    @Value("${shortenedLength}")
+    private int shortenedLength;
 
-        if(isUrlValid(longUrl)) {
+
+    public String checkUrl(String longUrl) {
+        if (isUrlValid(longUrl)) {
             return longUrl;
         }
 
-        if(usesHttp(longUrl)){
-            return "http://"+longUrl;
-        } else {
-            return "https://"+longUrl;
+        try {
+            return usesHttp(longUrl) ? "http://" + longUrl : "https://" + longUrl;
+        } catch (IOException e) {
+            throw new InvalidUrlException("Host is currently not reachable");
         }
 
     }
@@ -47,6 +54,12 @@ public class UrlUtil {
         String[] schemes = {"http", "https"};
         UrlValidator urlValidator = new UrlValidator(schemes);
         return urlValidator.isValid(longUrl);
+    }
+
+    public boolean isOriginalUrlLonger(String longUrl){
+        int shortUrlLength = shortenerHost.length() + shortenedLength;
+        int longUrlLength = longUrl.length();
+        return longUrlLength >= shortUrlLength;
     }
 
 
