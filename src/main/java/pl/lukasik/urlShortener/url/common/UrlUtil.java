@@ -56,10 +56,10 @@ public class UrlUtil {
         return urlValidator.isValid(longUrl);
     }
 
-    public boolean isOriginalUrlLonger(String longUrl){
+    public boolean isShortUrlLonger(String longUrl){
         int shortUrlLength = shortenerHost.length() + shortenedLength;
         int longUrlLength = longUrl.length();
-        return longUrlLength >= shortUrlLength;
+        return shortUrlLength >= longUrlLength;
     }
 
 
