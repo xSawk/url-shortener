@@ -10,10 +10,7 @@ import pl.lukasik.urlShortener.url.model.Url;
 import pl.lukasik.urlShortener.url.model.dto.ShortUrlDto;
 import pl.lukasik.urlShortener.url.repository.UrlRepository;
 
-import java.io.IOException;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 
 
 @Service
@@ -30,9 +27,9 @@ public class UrlService {
         this.urlUtil = urlUtil;
     }
 
-    public ShortUrlDto shortenUrl(String longUrl) {
-        if(urlUtil.isShortUrlLonger(longUrl)){
-            throw new InvalidUrlException("URL too short to shorten. Add '?continue=yes' to proceed.");
+    public ShortUrlDto shortenUrl(String longUrl, boolean flag) {
+        if(urlUtil.isShortUrlLonger(longUrl) && flag == false){
+            throw new InvalidUrlException("URL too short to shorten. Add '?flag=true' to proceed.");
         }
 
         String validUrl = urlUtil.checkUrl(longUrl);
