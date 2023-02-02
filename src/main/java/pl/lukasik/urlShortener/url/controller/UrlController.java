@@ -25,9 +25,9 @@ public class UrlController {
         return urlService.shortenUrl(longUrl.getLongUrl(), flag);
     }
 
-    @GetMapping("/{shortUrl}")
-    public ResponseEntity<Void> redirectShortUrl(@PathVariable String shortUrl) {
-        String retrieveUrl = urlService.getOriginalUrl(shortUrl);
+    @GetMapping("/{id}")
+    public ResponseEntity<Void> redirectShortUrl(@PathVariable String id) {
+        String retrieveUrl = urlService.getOriginalUrl(id);
         return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
                 .header("Location", retrieveUrl)
                 .build();

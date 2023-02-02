@@ -4,6 +4,7 @@ package pl.lukasik.urlShortener.url.service;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.lukasik.urlShortener.url.common.UrlUtil;
 import pl.lukasik.urlShortener.url.exception.InvalidUrlException;
 import pl.lukasik.urlShortener.url.model.Url;
@@ -11,6 +12,7 @@ import pl.lukasik.urlShortener.url.model.dto.ShortUrlDto;
 import pl.lukasik.urlShortener.url.repository.UrlRepository;
 
 import java.time.Instant;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Service
@@ -41,11 +43,13 @@ public class UrlService {
                 .build();
     }
 
-
-    public String getOriginalUrl(String shortUrl) {
-        Url retrieveUrl = urlRepository.findById(shortUrl).orElseThrow();
+    @Transactional
+    public String getOriginalUrl(String id) {
+        Url retrieveUrl = urlRepository.findById(id).orElseThrow();
+        increaseTotalVisits(retrieveUrl);
         return retrieveUrl.getOriginal_url();
     }
+
 
     private Url saveUrl(String longUrl) {
         ObjectId newObjectId = new ObjectId();
@@ -54,9 +58,17 @@ public class UrlService {
                 .original_url(longUrl)
                 .short_url(shortenerHost + newObjectId)
                 .created_at(Instant.now())
+                .totalVisits(new AtomicInteger(0))
                 .build();
         urlRepository.save(url);
         return url;
+    }
+
+    private void increaseTotalVisits(Url retrieveUrl) {
+        AtomicInteger totalVisits = retrieveUrl.getTotalVisits();
+        totalVisits.getAndIncrement();
+        retrieveUrl.setTotalVisits(totalVisits);
+        urlRepository.save(retrieveUrl);
     }
 
 

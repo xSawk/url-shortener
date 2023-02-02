@@ -6,7 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
-import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Builder
 @Getter
@@ -21,4 +21,7 @@ public class Url {
     private String original_url;
     private String short_url;
     private Instant created_at;
+    private AtomicInteger totalVisits;
+
+
 }
