@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lukasik.urlShortener.url.common.UrlUtil;
+import pl.lukasik.urlShortener.url.exception.ErrorMessages;
 import pl.lukasik.urlShortener.url.exception.InvalidUrlException;
 import pl.lukasik.urlShortener.url.model.Url;
 import pl.lukasik.urlShortener.url.model.dto.ShortUrlDto;
@@ -31,7 +32,7 @@ public class UrlService {
 
     public ShortUrlDto shortenUrl(String longUrl, boolean flag) {
         if(urlUtil.isShortUrlLonger(longUrl) && flag == false){
-            throw new InvalidUrlException("URL too short to shorten. Add '?flag=true' to proceed.");
+            throw new InvalidUrlException(ErrorMessages.URL_TOO_SHORT_ERROR_MESSAGE);
         }
 
         String validUrl = urlUtil.checkUrl(longUrl);

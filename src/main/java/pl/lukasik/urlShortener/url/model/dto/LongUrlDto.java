@@ -5,4 +5,5 @@ import lombok.Getter;
 
 @Getter
 public class LongUrlDto {
-    private String longUrl;}
+    private String longUrl;
+}
