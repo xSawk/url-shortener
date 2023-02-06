@@ -13,6 +13,7 @@ import pl.lukasik.urlShortener.url.model.dto.ShortUrlDto;
 import pl.lukasik.urlShortener.url.repository.UrlRepository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -71,6 +72,7 @@ public class UrlService {
         retrieveUrl.setTotalVisits(totalVisits);
         urlRepository.save(retrieveUrl);
     }
+
 
 
 }
