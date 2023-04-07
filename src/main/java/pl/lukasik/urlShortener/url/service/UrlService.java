@@ -13,7 +13,6 @@ import pl.lukasik.urlShortener.url.model.dto.ShortUrlDto;
 import pl.lukasik.urlShortener.url.repository.UrlRepository;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -31,8 +30,8 @@ public class UrlService {
         this.urlUtil = urlUtil;
     }
 
-    public ShortUrlDto shortenUrl(String longUrl, boolean flag) {
-        if(urlUtil.isShortUrlLonger(longUrl) && flag == false){
+    public ShortUrlDto shortenUrl(String longUrl, boolean allowShorting) {
+        if (urlUtil.isShortUrlLonger(longUrl) && !allowShorting) {
             throw new InvalidUrlException(ErrorMessages.URL_TOO_SHORT_ERROR_MESSAGE);
         }
 
@@ -47,11 +46,10 @@ public class UrlService {
 
     @Transactional
     public String getOriginalUrl(String id) {
-        Url retrieveUrl = urlRepository.findById(id).orElseThrow();
-        increaseTotalVisits(retrieveUrl);
-        return retrieveUrl.getOriginal_url();
+        Url originalUrl = urlRepository.findById(id).orElseThrow();
+        increaseTotalVisits(originalUrl);
+        return originalUrl.getOriginal_url();
     }
-
 
     private Url saveUrl(String longUrl) {
         ObjectId newObjectId = new ObjectId();
@@ -66,13 +64,10 @@ public class UrlService {
         return url;
     }
 
-    private void increaseTotalVisits(Url retrieveUrl) {
-        AtomicInteger totalVisits = retrieveUrl.getTotalVisits();
+    private void increaseTotalVisits(Url originalUrl) {
+        AtomicInteger totalVisits = originalUrl.getTotalVisits();
         totalVisits.getAndIncrement();
-        retrieveUrl.setTotalVisits(totalVisits);
-        urlRepository.save(retrieveUrl);
+        originalUrl.setTotalVisits(totalVisits);
+        urlRepository.save(originalUrl);
     }
-
-
-
 }

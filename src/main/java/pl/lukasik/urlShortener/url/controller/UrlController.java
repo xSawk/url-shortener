@@ -1,21 +1,19 @@
 package pl.lukasik.urlShortener.url.controller;
 
-
-import jakarta.annotation.security.RolesAllowed;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-import pl.lukasik.urlShortener.url.model.Url;
+
 import pl.lukasik.urlShortener.url.model.dto.LongUrlDto;
 import pl.lukasik.urlShortener.url.model.dto.ShortUrlDto;
 import pl.lukasik.urlShortener.url.service.UrlService;
 
-import java.util.List;
 
-
+/**
+ * UrlController class handles HTTP requests related to URL shortening and redirection.
+ */
 @RestController
+@RequestMapping("/api/v1/url")
 public class UrlController {
 
     private final UrlService urlService;
@@ -24,13 +22,24 @@ public class UrlController {
         this.urlService = urlService;
     }
 
-    @PostMapping("/api/shortener")
+    /**
+     * Shortens the given long URL.
+     * @param longUrl LongUrlDto containing the long URL to be shortened.
+     * @param allowShorting Optional flag, to shorten the URL even if it is longer than the original one
+     * @return ShortUrlDto containing the shortened URL.
+     */
+    @PostMapping("/shortener")
     public ShortUrlDto shortenUrl(@RequestBody LongUrlDto longUrl,
-                                  @RequestParam(required = false, defaultValue = "false") boolean flag) {
-        return urlService.shortenUrl(longUrl.getLongUrl(), flag);
+                                  @RequestParam(required = false, defaultValue = "false") boolean allowShorting) {
+        return urlService.shortenUrl(longUrl.getLongUrl(), allowShorting);
     }
 
-    @GetMapping("/{id}")
+    /**
+     * Redirects the user to the original URL corresponding to the given short URL ID.
+     * @param id Short URL ID.
+     * @return ResponseEntity containing the redirection status and headers.
+     */
+    @GetMapping("/redirect/{id}")
     public ResponseEntity<Void> redirectShortUrl(@PathVariable String id) {
         String retrieveUrl = urlService.getOriginalUrl(id);
         return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
@@ -38,14 +47,6 @@ public class UrlController {
                 .build();
     }
 
-    @GetMapping("/admin/urls")
-    @RolesAllowed("ADMIN")
-    public String getUrls(){
-        return "test";
-    }
 
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
+
 }
